@@ -133,6 +133,17 @@ class TestScanner_starter {
 			scanner.next();
 		});
 	}
+	
+	@Test
+	//Too large should still throw LexicalException
+	void numLitAlmostTooBig() throws LexicalException {
+		String input = "2147483647 2147483648";
+		IScanner scanner = CompilerComponentFactory.makeScanner(input);
+		checkNUM_LIT(2147483647, scanner.next());
+		assertThrows(LexicalException.class, () -> {
+			scanner.next();
+		});
+	}
 
 
 	@Test
@@ -237,6 +248,17 @@ class TestScanner_starter {
 	}
 
 	@Test
+	void illegalStringCharacter() throws LexicalException {
+		String input = """
+				\\
+				""";
+		IScanner scanner = CompilerComponentFactory.makeScanner(input);
+		assertThrows(LexicalException.class, () -> {
+			scanner.next();
+		});
+	}
+
+	@Test
 	void illegalChar() throws LexicalException {
 		String input = """
 				abc
@@ -250,7 +272,7 @@ class TestScanner_starter {
 		});
 	}
 
-	@Test
+		@Test
 	void allOperatorsAndSeparators() throws LexicalException {
 		/*  Operators and Separators . | , | ? | : | ( | ) | < | > | [ | ] | { | } | = | == | <-> | <= |  >= | ! | & | && | | | || |  
       + | - | * | ** | / | %   */
@@ -381,5 +403,17 @@ class TestScanner_starter {
 		checkToken(Kind.IDENT,"atann", new SourceLocation(2,72), scanner.next());
 		checkToken(Kind.IDENT,"iff", new SourceLocation(2,78), scanner.next());
 		checkToken(Kind.IDENT,"whilee", new SourceLocation(2,82), scanner.next());
+	}
+
+	@Test
+	void unterminatedString() throws LexicalException {
+		String input = """
+				\"thin
+				""";
+
+		IScanner scanner = CompilerComponentFactory.makeScanner(input);
+		assertThrows(LexicalException.class, () -> {
+			scanner.next();
+		});
 	}
 }
